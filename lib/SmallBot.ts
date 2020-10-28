@@ -101,8 +101,7 @@ export class SmallBot {
       "sync",
       [
         "full_state=false",
-        "timeout=" +
-        (this.config.syncTimeout ? this.config.syncTimeout : 10000),
+        "timeout=" + this.config.syncTimeout,
         (since ? ("since=" + since) : ""),
       ],
     );
