@@ -5,7 +5,7 @@ Very small implementation (bare essential) to quickly setup a Matrix Bot in Deno
 
 ## Examples
 
-```
+```typescript
 const client = new SmallBot({
     accessToken: "mysecretaccesstoken",
     homeserverUrl: "https://matrix.org/",
