@@ -11,8 +11,8 @@ export interface ISmallBotConfig {
   syncTimeout?: number;
   userId?: string;
   logger?: ISmallBotLogger;
-  storeName?: string;
   store?: ISmallBotStore;
+  formatHTMLtoPlain?: (html: string) => string;
 }
 
 export interface ISmallBotLogger {

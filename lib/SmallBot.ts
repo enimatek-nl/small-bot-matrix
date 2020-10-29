@@ -34,6 +34,9 @@ export class SmallBot {
         },
       };
     }
+    if (!config.formatHTMLtoPlain) {
+      config.formatHTMLtoPlain = (html) => html.replace(/<[^>]+>/g, "");
+    }
   }
 
   private async syncLoop(since?: string) {
@@ -132,10 +135,13 @@ export class SmallBot {
     msgType: string,
     formattedBody: string,
   ) {
+    const plain = this.config.formatHTMLtoPlain
+      ? this.config.formatHTMLtoPlain(formattedBody)
+      : "";
     const payload = {
       msgtype: msgType,
       format: "org.matrix.custom.html",
-      body: formattedBody.replace(/<[^>]+>/g, ""),
+      body: plain,
       formatted_body: formattedBody,
     };
     await this.sendEvent(roomId, "m.room.message", JSON.stringify(payload));
