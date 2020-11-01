@@ -1,6 +1,6 @@
 # SmallBot
 
-[![deno doc](https://doc.deno.land/badge.svg)](https://raw.githubusercontent.com/cybertim/SmallBotMatrix/main/mod.ts)
+[![deno doc](https://doc.deno.land/badge.svg)](https://doc.deno.land/https/raw.githubusercontent.com/cybertim/SmallBotMatrix/main/mod.ts)
 
 **S**mall **Ma**trix **L**itt**l**e Bot
 
@@ -24,4 +24,4 @@ await client.start();
 ```
 
 ## Documentation
-View it online at [doc.deno.land](https://raw.githubusercontent.com/cybertim/SmallBotMatrix/main/mod.ts)
+View it online at [doc.deno.land](https://doc.deno.land/https/raw.githubusercontent.com/cybertim/SmallBotMatrix/main/mod.ts)
