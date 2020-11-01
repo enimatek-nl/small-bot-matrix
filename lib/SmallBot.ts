@@ -8,9 +8,27 @@ import {
     MatrixWhoAmIResponse,
 } from "./ISmallBot.ts";
 
+/**
+ * Wrapper to interact with the matrix.org client API
+ */
 export class SmallBot {
     private requestId = 0;
 
+    /**
+     * Create an instance of `SmallBot`
+     * ```ts
+     * const client = new SmallBot({
+     *    accessToken: "mysecretaccesstoken",
+     *    homeserverUrl: "https://matrix.org/",
+     *    eventHandler: async (client, roomId, event) => {
+     *        if (event.sender !== client.ownUserId) {        
+     *            await client.sendRoomNotice(roomId, "You said: <b>" + event.content.body + "</b>");
+     *        }
+     *    }
+     *});
+     * ```
+     * @param config 
+     */
     constructor(private config: ISmallBotConfig) {
         if (!config.syncTimeout) config.syncTimeout = 10000;
         if (!config.homeserverUrl) config.homeserverUrl = "https://matrix.org";
@@ -70,6 +88,13 @@ export class SmallBot {
         return this.config.userId;
     }
 
+    /**
+     * Returns `MatrixUserProfileResponse` containing the current display name of the userId
+     * ```ts
+     * const profile = await client.getUserProfile(event.sender);
+     * ```
+     * @param userId ID of the user to retrieve the profile
+     */
     async getUserProfile(userId: string) {
         return await this.doRequest<MatrixUserProfileResponse>(
             "profile/" + userId,
@@ -77,10 +102,19 @@ export class SmallBot {
         );
     }
 
+    /**
+     * Returns `MatrixRoomStateResponse` of the given room id containing the current display name
+     * @param roomId ID of Room to get the display name
+     */
     async getRoomStateName(roomId: string) {
         return await this.doRequest<MatrixRoomStateResponse>("rooms/" + escape(roomId) + "/state/m.room.name/", []);
     }
 
+    /**
+     * Listens for new events on `/sync` with a timeout based on `syncTimeout` 
+     * This method is looped automatically when `start()` is called
+     * @param since token used to sync events from a specific point in time
+     */
     async getSync(since?: string) {
         const response = await this.doRequest<MatrixSyncResponse>(
             "sync",
@@ -94,22 +128,47 @@ export class SmallBot {
         return response;
     }
 
+    /**
+     * Returns the `MatrixWhoAmIResponse` containing the userId of the bot
+     */
     async whoAmI() {
         return await this.doRequest<MatrixWhoAmIResponse>("whoami", []);
     }
 
+    /**
+     * Returns the `MatrixJoinedRoomsResponse` containing a Map of all joined roomId's
+     */
     async joinedRooms() {
         return await this.doRequest<MatrixJoinedRoomsResponse>("joined_rooms", []);
     }
 
+    /**
+     * Alias of `sendMessage` with msgType `m.notice`
+     * @param roomId ID of the Room
+     * @param msg the HTML body of the message `formatHTMLtoPlain` will be used to create the plain-text version
+     */
     async sendRoomNotice(roomId: string, msg: string) {
         await this.sendMessage(roomId, "m.notice", msg);
     }
 
+    /**
+     * Alias of `sendMessage` with msgType `m.text`
+     * @param roomId ID of the Room
+     * @param msg the HTML body of the message `formatHTMLtoPlain` will be used to create the plain-text version
+     */
     async sendRoomText(roomId: string, msg: string) {
         await this.sendMessage(roomId, "m.text", msg);
     }
 
+    /**
+     * Send a custom message to a room
+     * ```ts
+     * await client.sendMessage(roomId, "m.text", "<b>hello world</b>");
+     * ```
+     * @param roomId ID of the Room
+     * @param msgType type like `m.text` or `m.notice`
+     * @param formattedBody the HTML body of the message `formatHTMLtoPlain` will be used to create the plain-text version
+     */
     async sendMessage(
         roomId: string,
         msgType: string,
@@ -125,6 +184,12 @@ export class SmallBot {
         await this.sendEvent(roomId, "m.room.message", JSON.stringify(payload));
     }
 
+    /**
+     * Call this method to start the /sync loop and send all events into your custom handler
+     * ```ts
+     * await client.start();
+     * ```
+     */
     async start() {
         try {
             if (!this.config.userId) {
