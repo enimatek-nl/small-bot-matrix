@@ -132,7 +132,7 @@ export class SmallBot {
      * Returns the `MatrixWhoAmIResponse` containing the userId of the bot
      */
     async whoAmI() {
-        return await this.doRequest<MatrixWhoAmIResponse>("whoami", []);
+        return await this.doRequest<MatrixWhoAmIResponse>("account/whoami", []);
     }
 
     /**
