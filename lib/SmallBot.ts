@@ -21,13 +21,13 @@ export class SmallBot {
      *    accessToken: "mysecretaccesstoken",
      *    homeserverUrl: "https://matrix.org/",
      *    eventHandler: async (client, roomId, event) => {
-     *        if (event.sender !== client.ownUserId) {        
+     *        if (event.sender !== client.ownUserId) {
      *            await client.sendRoomNotice(roomId, "You said: <b>" + event.content.body + "</b>");
      *        }
      *    }
      *});
      * ```
-     * @param config 
+     * @param config
      */
     constructor(private config: ISmallBotConfig) {
         if (!config.syncTimeout) config.syncTimeout = 10000;
@@ -59,7 +59,9 @@ export class SmallBot {
 
     private async syncLoop(since?: string) {
         const syncResponse = await this.getSync(since);
-        for (const entry of syncResponse.rooms.join.entries()) {
+        const entries = syncResponse.rooms?.join?.entries?.() || [];
+
+        for (const entry of entries) {
             for (const event of entry[1].timeline.events) {
                 await this.config.eventHandler(this, entry[0], event);
             }
@@ -111,7 +113,7 @@ export class SmallBot {
     }
 
     /**
-     * Listens for new events on `/sync` with a timeout based on `syncTimeout` 
+     * Listens for new events on `/sync` with a timeout based on `syncTimeout`
      * This method is looped automatically when `start()` is called
      * @param since token used to sync events from a specific point in time
      */
@@ -124,7 +126,11 @@ export class SmallBot {
                 (since ? ("since=" + since) : ""),
             ]
         );
-        response.rooms.join = new Map<string, MatrixRoomEvent>(Object.entries(response.rooms.join));
+
+        if (response?.rooms?.join) {
+            response.rooms.join = new Map<string, MatrixRoomEvent>(Object.entries(response.rooms.join));
+        }
+
         return response;
     }
 
