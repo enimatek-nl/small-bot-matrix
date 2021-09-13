@@ -124,7 +124,11 @@ export class SmallBot {
                 (since ? ("since=" + since) : ""),
             ]
         );
-        response.rooms.join = new Map<string, MatrixRoomEvent>(Object.entries(response.rooms.join));
+        if (response.rooms && response.rooms.join) {
+            response.rooms.join = new Map<string, MatrixRoomEvent>(Object.entries(response.rooms.join));
+        } else {
+            response.rooms = {join: new Map<string, MatrixRoomEvent>()};
+        }
         return response;
     }
 
@@ -132,7 +136,7 @@ export class SmallBot {
      * Returns the `MatrixWhoAmIResponse` containing the userId of the bot
      */
     async whoAmI() {
-        return await this.doRequest<MatrixWhoAmIResponse>("whoami", []);
+        return await this.doRequest<MatrixWhoAmIResponse>("account/whoami", []);
     }
 
     /**
